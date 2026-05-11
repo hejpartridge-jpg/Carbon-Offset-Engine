@@ -131,15 +131,16 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
     sp_5yr  = simple_recovery(5)
     sp_10yr = simple_recovery(10)
 
-    # ── years 15 and 20 — ML model ────────────────────────────
-    # call model once with years_since_closure=15
-    # pred[0] = species_5yr output  → anchor at closure + 15
-    # pred[1] = species_10yr output → anchor at closure + 20
-    ml_pred = predict_at(15)
-    ml_15yr = ml_pred[0]
-    ml_20yr = ml_pred[1]
+    # ── years 15 and 20 — separate ML calls ──────────────────
+    ml_pred_15 = predict_at(15)
+    ml_pred_20 = predict_at(20)
 
-    # sanity check — fall back to simple if ML gives bad result
+    # use species_10yr output from each call
+    # as it represents the longer-term prediction
+    ml_15yr = ml_pred_15[1]  # species_10yr at 15 years since closure
+    ml_20yr = ml_pred_20[1]  # species_10yr at 20 years since closure
+
+    # sanity check
     sp_15yr = max(sp_10yr, ml_15yr) if ml_15yr > species_before * 0.8 else simple_recovery(15)
     sp_20yr = max(sp_15yr, ml_20yr) if ml_20yr > species_before * 0.8 else simple_recovery(20)
 
