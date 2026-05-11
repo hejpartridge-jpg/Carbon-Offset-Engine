@@ -6,12 +6,18 @@
 # Python
 __pycache__/
 *.pyc
-*.pyo
 .env
 
 # Mac
 .DS_Store
 
-# Large data files not needed for app
-ML Data/Training/
-*.csv.bak
+# Large LCM raster files — stored locally only
+*.tif
+Land data *.zip
+ML Data/land_*/
+land_*/
+
+# Large data files
+*.parquet
+*.xml
+*.zip
