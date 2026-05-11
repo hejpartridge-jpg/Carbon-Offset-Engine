@@ -92,8 +92,15 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
     dist_1ha          = hab["dist_1ha_patch_km"]  if pd.notna(hab["dist_1ha_patch_km"])  else None
     dist_5ha          = hab["dist_5ha_patch_km"]  if pd.notna(hab["dist_5ha_patch_km"])  else None
 
-    # ── check habitat data is available ──────────────────────
-    if dist_any is None and dist_1ha is None and dist_5ha is None:
+    # ── check habitat data is valid ───────────────────────────
+    # NaN = site outside LCM coverage (islands etc)
+    # 0.0 = coordinates landed on wrong pixel
+    invalid_dist = (
+        dist_any is None or dist_1ha is None or dist_5ha is None or
+        (dist_any == 0.0 and dist_1ha == 0.0 and dist_5ha == 0.0)
+    )
+
+    if invalid_dist:
         return {
             "species_5yr":          species_before,
             "species_10yr":         species_before,
@@ -104,19 +111,13 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
             "lat":                  lat,
             "lon":                  lon,
             "rainfall":             rainfall,
-            "dist_1ha":             None,
+            "dist_1ha":             dist_1ha,
             "years_operational":    years_operational,
             "prediction_reliable":  False,
-            "reason":               "Habitat distance data not available for this location. "
-                                    "The CEH Land Cover Map only covers the Great Britain mainland — "
-                                    "sites in Northern Ireland, Orkney, Shetland or other islands "
-                                    "cannot be assessed.",
+            "reason":               "Habitat distance data is unreliable for this location. "
+                                    "The site may be on an island, coastal area, or the coordinates "
+                                    "may fall outside the CEH Land Cover Map coverage area.",
         }
-
-    # use fallback defaults if only some distances are missing
-    dist_any = dist_any if dist_any is not None else 2.0
-    dist_1ha = dist_1ha if dist_1ha is not None else 2.0
-    dist_5ha = dist_5ha if dist_5ha is not None else 4.0
 
     # predict from NOW — 5 and 10 years from current year
     years_since_5yr  = max(1, (CURRENT_YEAR + 5)  - closure_year)
