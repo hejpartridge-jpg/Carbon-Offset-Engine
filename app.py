@@ -45,7 +45,10 @@ ml_model, model_metrics = load_models()
 
 # ── Constants ─────────────────────────────────────────────────
 ECOSYSTEM_VALUE_PER_HA_YR = 7500
-CURRENT_YEAR = 2026
+CURRENT_YEAR              = 2026
+BLEND_THRESHOLD           = 15    # years since closure at which ML model becomes reliable
+RECOVERY_RATE_PER_YEAR    = 0.025 # 2.5% species gain per year for simple recovery
+                                   # source: Natural England habitat restoration guidance
 
 HABITAT_QUALITY_FACTOR = {
     "Solar":   0.3,
@@ -91,41 +94,56 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
     dist_any          = hab["dist_any_intact_km"] if pd.notna(hab["dist_any_intact_km"]) else None
     dist_1ha          = hab["dist_1ha_patch_km"]  if pd.notna(hab["dist_1ha_patch_km"])  else None
     dist_5ha          = hab["dist_5ha_patch_km"]  if pd.notna(hab["dist_5ha_patch_km"])  else None
+    if species_before == 0:
+        species_before = 1
 
     # ── check habitat data is valid ───────────────────────────
-    # NaN = site outside LCM coverage (islands etc)
-    # 0.0 = coordinates landed on wrong pixel
     invalid_dist = (
         dist_any is None or dist_1ha is None or dist_5ha is None or
         (dist_any == 0.0 and dist_1ha == 0.0 and dist_5ha == 0.0)
     )
+
+    # effective start = whichever is later, now or closure
+    effective_start  = max(CURRENT_YEAR, closure_year)
+    years_since_5yr  = (effective_start + 5)  - closure_year
+    years_since_10yr = (effective_start + 10) - closure_year
 
     if invalid_dist:
         return {
             "species_5yr":          species_before,
             "species_10yr":         species_before,
             "species_before":       species_before,
-            "prediction_year_5yr":  CURRENT_YEAR + 5,
-            "prediction_year_10yr": CURRENT_YEAR + 10,
+            "prediction_year_5yr":  effective_start + 5,
+            "prediction_year_10yr": effective_start + 10,
             "not_yet_closed":       closure_year > CURRENT_YEAR,
             "lat":                  lat,
             "lon":                  lon,
             "rainfall":             rainfall,
-            "dist_1ha":             dist_1ha,
+            "dist_1ha":             None,
             "years_operational":    years_operational,
             "prediction_reliable":  False,
+            "method":               None,
             "reason":               "Habitat distance data is unreliable for this location. "
                                     "The site may be on an island, coastal area, or the coordinates "
                                     "may fall outside the CEH Land Cover Map coverage area.",
         }
 
-    # predict from whichever is later — now or closure date
-    # ensures every plant gets a genuine 5 and 10 year recovery window
-    effective_start  = max(CURRENT_YEAR, closure_year)
-    years_since_5yr  = (effective_start + 5)  - closure_year
-    years_since_10yr = (effective_start + 10) - closure_year
+    # use fallback defaults if only some distances are missing
+    dist_any = dist_any if dist_any is not None else 2.0
+    dist_1ha = dist_1ha if dist_1ha is not None else 2.0
+    dist_5ha = dist_5ha if dist_5ha is not None else 4.0
 
-    def predict_at(years_since):
+    # ── recovery prediction ───────────────────────────────────
+    def simple_recovery(years_since):
+        """
+        Linear recovery estimate for early years post closure
+        2.5% species gain per year
+        Source: Natural England habitat restoration guidance
+        """
+        return species_before * (1 + RECOVERY_RATE_PER_YEAR * years_since)
+
+    def ml_recovery(years_since):
+        """ML model prediction for longer term recovery"""
         input_data = pd.DataFrame([{
             "Years Operational":           years_operational,
             "Site Area (ha)":              site_ha,
@@ -140,12 +158,33 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
         }])
         return ml_model.predict(input_data)[0]
 
-    pred_5yr  = predict_at(years_since_5yr)
-    pred_10yr = predict_at(years_since_10yr)
+    def best_prediction(years_since, idx):
+        """
+        Use simple recovery for short windows where ML extrapolates poorly
+        Switch to ML model once enough time has passed
+        """
+        if years_since < BLEND_THRESHOLD:
+            return simple_recovery(years_since)
+        ml_pred = ml_recovery(years_since)[idx]
+        if ml_pred > species_before * 0.8:
+            return max(species_before, ml_pred)
+        return simple_recovery(years_since)
+
+    species_5yr  = best_prediction(years_since_5yr,  0)
+    species_10yr = best_prediction(years_since_10yr, 1)
+
+    # determine which method was used
+    method = "ml_model" if (
+        years_since_5yr  >= BLEND_THRESHOLD and
+        years_since_10yr >= BLEND_THRESHOLD
+    ) else "simple_recovery" if (
+        years_since_5yr  < BLEND_THRESHOLD and
+        years_since_10yr < BLEND_THRESHOLD
+    ) else "mixed"
 
     return {
-        "species_5yr":          max(species_before, pred_5yr[0]),
-        "species_10yr":         max(species_before, pred_10yr[1]),
+        "species_5yr":          species_5yr,
+        "species_10yr":         species_10yr,
         "species_before":       species_before,
         "prediction_year_5yr":  effective_start + 5,
         "prediction_year_10yr": effective_start + 10,
@@ -156,6 +195,7 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
         "dist_1ha":             dist_1ha,
         "years_operational":    years_operational,
         "prediction_reliable":  True,
+        "method":               method,
         "reason":               None,
     }
 
@@ -564,7 +604,7 @@ if st.sidebar.button("Calculate ROI", type="primary"):
     st.header("🌿 Ecological Recovery")
 
     if prediction and not prediction.get("prediction_reliable", True):
-        st.warning(f"⚠️ {prediction.get('reason', 'Species prediction not available for this plant.')}")
+        st.warning(f"⚠️ {prediction.get('reason', 'Species prediction not available.')}")
 
     elif prediction and prediction.get("prediction_reliable", True):
         sp_before  = prediction["species_before"]
@@ -572,12 +612,27 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         sp_10yr    = prediction["species_10yr"]
         yr5_label  = prediction["prediction_year_5yr"]
         yr10_label = prediction["prediction_year_10yr"]
+        method     = prediction.get("method", "ml_model")
         site_ha_v  = plant_row["site_ha"] if pd.notna(plant_row["site_ha"]) else 10
         if sp_before == 0: sp_before = 1
         uplift_5yr  = max(0, (sp_5yr  - sp_before) / sp_before)
         uplift_10yr = max(0, (sp_10yr - sp_before) / sp_before)
         ann_5       = ECOSYSTEM_VALUE_PER_HA_YR * uplift_5yr  * site_ha_v
         ann_10      = ECOSYSTEM_VALUE_PER_HA_YR * uplift_10yr * site_ha_v
+
+        # show method note
+        if method == "simple_recovery":
+            st.info(
+                "ℹ️ Species recovery estimated using UK ecological recovery rates "
+                f"({RECOVERY_RATE_PER_YEAR*100:.1f}% gain/year) as the ML model requires "
+                "longer post-closure periods to make reliable predictions. "
+                "Source: Natural England habitat restoration guidance."
+            )
+        elif method == "mixed":
+            st.info(
+                "ℹ️ Short-term species recovery uses UK ecological recovery rates. "
+                "Longer-term recovery uses the ML model trained on 89 historical sites."
+            )
 
         fig_eco, (ax_sp, ax_val) = plt.subplots(1, 2, figsize=(14, 6))
         fig_eco.suptitle(f"Ecological Recovery — {selected_plant}",
@@ -615,7 +670,7 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         r2_5  = model_metrics["species_5yr"]["r2"]
         r2_10 = model_metrics["species_10yr"]["r2"]
         ax_sp.text(0.02, 0.02,
-                   f"⚠️ R²: yr5={r2_5:.2f}, yr10={r2_10:.2f}\nBased on 89 historical sites",
+                   f"Method: {method}\nML R²: yr5={r2_5:.2f}, yr10={r2_10:.2f}\nBased on 89 historical sites",
                    transform=ax_sp.transAxes, fontsize=8, color="grey", va="bottom")
 
         sp_cumulative = []
@@ -652,7 +707,7 @@ if st.sidebar.button("Calculate ROI", type="primary"):
 
         st.caption(
             f"⚠️ Species predictions based on 89 historical UK power station sites. "
-            f"R²={r2_10:.2f}. Use as directional indicator only."
+            f"ML model R²={r2_10:.2f}. Use as directional indicator only."
         )
     else:
         st.info("No species prediction available for this plant.")
@@ -660,7 +715,8 @@ if st.sidebar.button("Calculate ROI", type="primary"):
     st.markdown("---")
     st.caption(
         "Sources: ONS Natural Capital Accounts 2023 | GBIF Biodiversity Database | "
-        "CEH Land Cover Map | Open-Meteo Climate API | DUKES 2024"
+        "CEH Land Cover Map | Open-Meteo Climate API | DUKES 2024 | "
+        "Natural England habitat restoration guidance"
     )
 
 else:
@@ -686,4 +742,5 @@ else:
     - CEH Land Cover Map — UK habitat data
     - Open-Meteo — Historical climate data
     - ONS Natural Capital Accounts 2023
+    - Natural England habitat restoration guidance
     """)
