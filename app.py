@@ -88,14 +88,37 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
     site_ha           = plant_row["site_ha"] if pd.notna(plant_row["site_ha"]) else 20
     species_before    = spe["species_before"]  if pd.notna(spe["species_before"])  else 150
     rainfall          = spe["annual_rainfall"]  if pd.notna(spe["annual_rainfall"]) else 800
-    dist_any          = hab["dist_any_intact_km"] if pd.notna(hab["dist_any_intact_km"]) else 2.0
-    dist_1ha          = hab["dist_1ha_patch_km"]  if pd.notna(hab["dist_1ha_patch_km"])  else 2.0
-    dist_5ha          = hab["dist_5ha_patch_km"]  if pd.notna(hab["dist_5ha_patch_km"])  else 4.0
+    dist_any          = hab["dist_any_intact_km"] if pd.notna(hab["dist_any_intact_km"]) else None
+    dist_1ha          = hab["dist_1ha_patch_km"]  if pd.notna(hab["dist_1ha_patch_km"])  else None
+    dist_5ha          = hab["dist_5ha_patch_km"]  if pd.notna(hab["dist_5ha_patch_km"])  else None
 
-    # predict from NOW not from closure
-    # so if plant closes in 2027:
-    #   5yr window  = 2031 → years_since_closure = 2031 - 2027 = 4
-    #   10yr window = 2036 → years_since_closure = 2036 - 2027 = 9
+    # ── check habitat data is available ──────────────────────
+    if dist_any is None and dist_1ha is None and dist_5ha is None:
+        return {
+            "species_5yr":          species_before,
+            "species_10yr":         species_before,
+            "species_before":       species_before,
+            "prediction_year_5yr":  CURRENT_YEAR + 5,
+            "prediction_year_10yr": CURRENT_YEAR + 10,
+            "not_yet_closed":       closure_year > CURRENT_YEAR,
+            "lat":                  lat,
+            "lon":                  lon,
+            "rainfall":             rainfall,
+            "dist_1ha":             None,
+            "years_operational":    years_operational,
+            "prediction_reliable":  False,
+            "reason":               "Habitat distance data not available for this location. "
+                                    "The CEH Land Cover Map only covers the Great Britain mainland — "
+                                    "sites in Northern Ireland, Orkney, Shetland or other islands "
+                                    "cannot be assessed.",
+        }
+
+    # use fallback defaults if only some distances are missing
+    dist_any = dist_any if dist_any is not None else 2.0
+    dist_1ha = dist_1ha if dist_1ha is not None else 2.0
+    dist_5ha = dist_5ha if dist_5ha is not None else 4.0
+
+    # predict from NOW — 5 and 10 years from current year
     years_since_5yr  = max(1, (CURRENT_YEAR + 5)  - closure_year)
     years_since_10yr = max(1, (CURRENT_YEAR + 10) - closure_year)
 
@@ -130,6 +153,7 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
         "dist_1ha":             dist_1ha,
         "years_operational":    years_operational,
         "prediction_reliable":  True,
+        "reason":               None,
     }
 
 def calculate_species_roi(prediction, plant_row):
@@ -536,7 +560,10 @@ if st.sidebar.button("Calculate ROI", type="primary"):
     # ═══════════════════════════════════════════════════════════
     st.header("🌿 Ecological Recovery")
 
-    if prediction:
+    if prediction and not prediction.get("prediction_reliable", True):
+        st.warning(f"⚠️ {prediction.get('reason', 'Species prediction not available for this plant.')}")
+
+    elif prediction and prediction.get("prediction_reliable", True):
         sp_before  = prediction["species_before"]
         sp_5yr     = prediction["species_5yr"]
         sp_10yr    = prediction["species_10yr"]
@@ -562,7 +589,6 @@ if st.sidebar.button("Calculate ROI", type="primary"):
             else:
                 trajectory.append(sp_10yr)
 
-        # x axis shows actual calendar years from now
         calendar_years = [CURRENT_YEAR + y for y in years]
 
         ax_sp.plot(calendar_years, trajectory, color="#2ecc71", linewidth=2.5)
@@ -617,9 +643,9 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         st.pyplot(fig_eco)
 
         col1, col2, col3 = st.columns(3)
-        col1.metric("Baseline Species",       f"{sp_before:.0f}")
-        col2.metric(f"Predicted {yr5_label}", f"{sp_5yr:.0f}")
-        col3.metric(f"Predicted {yr10_label}",f"{sp_10yr:.0f}")
+        col1.metric("Baseline Species",        f"{sp_before:.0f}")
+        col2.metric(f"Predicted {yr5_label}",  f"{sp_5yr:.0f}")
+        col3.metric(f"Predicted {yr10_label}", f"{sp_10yr:.0f}")
 
         st.caption(
             f"⚠️ Species predictions based on 89 historical UK power station sites. "
