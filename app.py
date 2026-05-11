@@ -119,9 +119,11 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
                                     "may fall outside the CEH Land Cover Map coverage area.",
         }
 
-    # predict from NOW — 5 and 10 years from current year
-    years_since_5yr  = max(1, (CURRENT_YEAR + 5)  - closure_year)
-    years_since_10yr = max(1, (CURRENT_YEAR + 10) - closure_year)
+    # predict from whichever is later — now or closure date
+    # ensures every plant gets a genuine 5 and 10 year recovery window
+    effective_start  = max(CURRENT_YEAR, closure_year)
+    years_since_5yr  = (effective_start + 5)  - closure_year
+    years_since_10yr = (effective_start + 10) - closure_year
 
     def predict_at(years_since):
         input_data = pd.DataFrame([{
@@ -145,8 +147,8 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
         "species_5yr":          max(species_before, pred_5yr[0]),
         "species_10yr":         max(species_before, pred_10yr[1]),
         "species_before":       species_before,
-        "prediction_year_5yr":  CURRENT_YEAR + 5,
-        "prediction_year_10yr": CURRENT_YEAR + 10,
+        "prediction_year_5yr":  effective_start + 5,
+        "prediction_year_10yr": effective_start + 10,
         "not_yet_closed":       closure_year > CURRENT_YEAR,
         "lat":                  lat,
         "lon":                  lon,
