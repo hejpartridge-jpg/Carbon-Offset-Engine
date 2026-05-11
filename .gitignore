@@ -1,0 +1,17 @@
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Mac
+.DS_Store
+
+# Large data files not needed for app
+ML Data/Training/
+*.csv.bak

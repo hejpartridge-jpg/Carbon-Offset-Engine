@@ -1,0 +1,11 @@
+streamlit
+pandas
+numpy
+matplotlib
+xgboost
+scikit-learn
+pyproj
+rasterio
+scipy
+requests
+pickle5

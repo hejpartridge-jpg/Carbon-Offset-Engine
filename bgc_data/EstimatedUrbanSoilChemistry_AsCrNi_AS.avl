@@ -1,0 +1,222 @@
+/3.2
+(ODB.1
+	FirstRootClassName:	"Legend"
+	Roots:	2
+	Version:	32
+)
+
+(Legend.2
+	SymType:	0x02
+	LegType:	0x02
+	ClassType:	0x03
+	FieldNames:	3
+	Symbols:	4
+	Class:	29
+	Class:	30
+	Class:	31
+	Class:	32
+	Class:	33
+	Class:	34
+	StdDevs:	1.00000000000000
+	NullSym:	25
+	NullValues:	35
+	StatValues:	36
+	Precision:	-3
+)
+
+(AVStr.3
+	S:	"As_mgkg"
+)
+
+(SymList.4
+	Child:	5
+	Child:	9
+	Child:	13
+	Child:	17
+	Child:	21
+	Child:	25
+)
+
+(BShSym.5
+	Color:	6
+	Outline:	1
+	OutlineColor:	7
+	OutlineWidth:	0.10000000000000
+	BgColor:	8
+)
+
+(TClr.6
+	Blue:	0xffff
+)
+
+(TClr.7
+	Name:	"Transparent"
+)
+
+(TClr.8
+	Red:	0xffff
+	Green:	0xffff
+	Blue:	0xffff
+)
+
+(BShSym.9
+	Color:	10
+	Outline:	1
+	OutlineColor:	11
+	OutlineWidth:	0.10000000000000
+	BgColor:	12
+)
+
+(TClr.10
+	Green:	0xffff
+)
+
+(TClr.11
+	Name:	"Transparent"
+)
+
+(TClr.12
+	Red:	0xffff
+	Green:	0xffff
+	Blue:	0xffff
+)
+
+(BShSym.13
+	Color:	14
+	Outline:	1
+	OutlineColor:	15
+	OutlineWidth:	0.10000000000000
+	BgColor:	16
+)
+
+(TClr.14
+	Red:	0xffff
+	Green:	0xffff
+)
+
+(TClr.15
+	Name:	"Transparent"
+)
+
+(TClr.16
+	Red:	0xffff
+	Green:	0xffff
+	Blue:	0xffff
+)
+
+(BShSym.17
+	Color:	18
+	Outline:	1
+	OutlineColor:	19
+	OutlineWidth:	0.10000000000000
+	BgColor:	20
+)
+
+(TClr.18
+	Red:	0xff00
+	Green:	0xad9f
+	Blue:	0xfe
+)
+
+(TClr.19
+	Name:	"Transparent"
+)
+
+(TClr.20
+	Red:	0xffff
+	Green:	0xffff
+	Blue:	0xffff
+)
+
+(BShSym.21
+	Color:	22
+	Outline:	1
+	OutlineColor:	23
+	OutlineWidth:	0.10000000000000
+	BgColor:	24
+)
+
+(TClr.22
+	Red:	0xffff
+)
+
+(TClr.23
+	Name:	"Transparent"
+)
+
+(TClr.24
+	Red:	0xffff
+	Green:	0xffff
+	Blue:	0xffff
+)
+
+(BShSym.25
+	Color:	26
+	Outline:	1
+	OutlineColor:	27
+	OutlineWidth:	0.10000000000000
+	BgColor:	28
+)
+
+(TClr.26
+	Name:	"Transparent"
+)
+
+(TClr.27
+	Name:	"Transparent"
+)
+
+(TClr.28
+	Red:	0xffff
+	Green:	0xffff
+	Blue:	0xffff
+)
+
+(LClass.29
+	Label:	"1 - 20"
+	MinNum:	1.00000000000000
+	MaxNum:	20.00000000000000
+	Precision:	-3
+)
+
+(LClass.30
+	Label:	"21 - 30"
+	MinNum:	21.00000000000000
+	MaxNum:	30.00000000000000
+	Precision:	-3
+)
+
+(LClass.31
+	Label:	"31 - 40"
+	MinNum:	31.00000000000000
+	MaxNum:	40.00000000000000
+	Precision:	-3
+)
+
+(LClass.32
+	Label:	"41 - 80"
+	MinNum:	41.00000000000000
+	MaxNum:	80.00000000000000
+	Precision:	-3
+)
+
+(LClass.33
+	Label:	"81 - 2030"
+	MinNum:	81.00000000000000
+	MaxNum:	2030.00000000000000
+	Precision:	-3
+)
+
+(LClass.34
+	IsNoData:	1
+	Label:	"No Data"
+	MaxNum:	-1.00000000000000
+	Precision:	-3
+)
+
+(NameDict.35
+)
+
+(NameDict.36
+)
+

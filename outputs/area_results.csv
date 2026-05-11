@@ -1,0 +1,107 @@
+Name,Location,District/ county,Region,Coordinates,Type,Total capacity (MW),Opened,Closed,Years Operational,Post Closure Land use?,Remediation Type,Contamination level ,Site area,Surrounding land use,Distance to intact habitat,SSSI within 5km,Annual rainfall,Species counts,lat,lon,site_ha,site_ha_source
+Acton Lane B,North Acton,Ealing,Greater London,51°31′50″N 0°15′21″W,Coal,150.0,1950.0,1983,33.0,Brownfield,Partial,,,,,,, ,51.53055555555555,-0.25583333333333336,45.0,OSMnx
+Agecroft A,Pendlebury,Salford,North West,53°30′55″N 2°18′03″W,Coal,100.0,1925.0,1992,67.0,Redeveloped,Partial,,,,,,,,53.515277777777776,-2.3008333333333333,30.0,OSMnx
+Agecroft B,Pendlebury,Salford,North West,53°30′55″N 2°18′03″W,Coal,120.0,1962.0,1992,30.0,Redeveloped,Partial,,,,,,,,53.515277777777776,-2.3008333333333333,36.0,OSMnx
+Agecroft C,Pendlebury,Salford,North West,53°30′55″N 2°18′03″W,Coal,240.0,1962.0,1992,30.0,Redeveloped,Partial,,,,,,,,53.515277777777776,-2.3008333333333333,72.0,OSMnx
+Ashford B,Ashford,Kent,South East,51°08′44″N 0°52′08″E,Diesel,10.0,1954.0,1981,27.0,Remediation then redevelopment,Partial,,,,,,,,51.14555555555555,0.8688888888888889,0.4,OSMnx
+Bankside B,Bankside,Southwark,Greater London,51°30′25″N 0°05′55″W,Oil,300.0,1952.0,1981,29.0,Redeveloped,Full,,,,,,,,51.50694444444444,-0.09861111111111111,30.0,OSMnx
+Barking C,Creekmouth,Barking and Dagenham,Greater London,51°30′59″N 0°06′40″E,Coal,220.0,1954.0,1981,27.0,Remediation,Full,,,,,,,,51.51638888888889,0.11111111111111112,66.0,OSMnx
+Barking Reach,Dagenham,Barking and Dagenham,Greater London,51°31′16″N 0°08′49″E,CCGT,1000.0,1995.0,2016,21.0,Redeveloped,Full,,,,,,,,51.52111111111111,0.14694444444444443,75.0,OSMnx
+Battersea B,Battersea,Wandsworth,Greater London,51°28′54″N 0°08′41″W,Coal,503.0,1955.0,1983,28.0,Redeveloped,Full,,,,,,,,51.48166666666667,-0.14472222222222222,150.9,OSMnx
+Berkeley 1,Berkeley,Gloucestershire,South West,51°41′33″N 2°29′37″W,Nuclear (magnox),138.0,1962.0,1989,27.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,51.692499999999995,-2.493611111111111,20.7,OSMnx
+Berkeley 2,Berkeley,Gloucestershire,South West,51°41′33″N 2°29′37″W,Nuclear (magnox),138.0,1962.0,1988,26.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,51.692499999999995,-2.493611111111111,20.7,OSMnx
+Blackwall Point,Greenwich Peninsula,Greenwich,Greater London,51°29′52″N 0°00′41″E,Coal,100.5,1900.0,1981,81.0,Redeveloped,Partial,,,,,,,,51.49777777777778,0.01138888888888889,30.1,OSMnx
+Blyth A,Cambois,Northumberland,North East,55°08′33″N 1°31′37″W,Coal,480.0,1958.0,1999,41.0,Partially Demolished,Passive rewilding,,,,,,,,55.1425,-1.5269444444444444,144.0,OSMnx
+Blyth B,Cambois,Northumberland,North East,,Coal,1250.0,1962.0,2001,39.0,Partially Demolished,Passive rewilding,,,,,,,,,,375.0,OSMnx
+Bold,Bold,Liverpool City Region,North West,53°26′02″N 2°41′18″W,Coal,300.0,1960.0,1990,30.0,Redeveloped,Partial,,,,,,,,53.43388888888889,-2.6883333333333335,90.0,OSMnx
+Bradwell A,Bradwell-on-Sea,Essex,East,51°44′29″N 0°53′49″E,Nuclear (magnox),123.0,1962.0,2002,40.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,51.74138888888889,0.8969444444444444,18.4,OSMnx
+Brunswick Wharf,Blackwall,Tower Hamlets,Greater London,51°30′29″N 0°00′04″E,Coal+oil,340.0,1952.0,1984,32.0,Redeveloped,Partial,,,,,,,,51.50805555555556,0.0011111111111111111,102.0,OSMnx
+Bulls Bridge,Hayes,Hillingdon,Greater London,51°30′07″N 0°24′32″W,OCGT,280.0,1980.0,1993,13.0,Redeveloped,Partial,,,,,,,,51.50194444444445,-0.4088888888888889,42.0,OSMnx
+Calder Hall,Seascale,Cumbria,North West,54°25′14″N 3°29′51″W,Nuclear (magnox),200.0,1956.0,2003,47.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,54.42055555555555,-3.4975,30.0,OSMnx
+Carrington Coal,Carrington,Greater Manchester,North West,53°26′09″N 2°24′39″W,Coal,240.0,1956.0,1991,35.0,New energy site,Partial,,,,,,,,53.43583333333333,-2.410833333333333,72.0,OSMnx
+Castle Donington,Castle Donington,Leicestershire,East Midlands,52°50′52″N 1°21′31″W,Coal,600.0,1958.0,1995,37.0,Redeveloped,Partial,,,,,,,,52.84777777777778,-1.3586111111111112,180.0,OSMnx
+Chadderton B,Chadderton,Greater Manchester,North West,53°31′54″N 2°09′57″W,Coal,240.0,1955.0,1982,27.0,Redeveloped,Partial,,,,,,,,53.531666666666666,-2.165833333333333,72.0,OSMnx
+Cliff Quay[6],Ipswich,Suffolk,East,52°02′09″N 1°09′28″E,Coal,276.0,,1984,,Redeveloped,Partial,,,,,,,,52.03583333333333,1.1577777777777778,82.8,OSMnx
+Cottam,Cottam,Nottinghamshire,East Midlands,53°18′14″N 0°46′53″W,Coal,2000.0,1968.0,2019,51.0,Remediation,Full,,,,,,,,53.303888888888885,-0.7813888888888889,600.0,OSMnx
+Croydon B,Purley,Croydon,Greater London,51°22′44″N 0°07′16″W,Coal,338.0,1950.0,1984,34.0,Redeveloped,Partial,,,,,,,,51.37888888888889,-0.12111111111111111,101.4,OSMnx
+Deptford West,Deptford,Greater London,Greater London,51°28′57″N 0°01′13″W,Coal,158.0,1929.0,1983,54.0,Redeveloped,Full,,,,,,,,51.4825,-0.020277777777777777,47.4,OSMnx
+Derwenthaugh Coke Works,Swalwell,Tyne and Wear,North East,,Waste Gas,,1928.0,1986,58.0,Active remediation and rewilding,Full,,,,,,,,,,,estimated
+Didcot A,Didcot,Oxfordshire,South East,51°37′25″N 1°16′03″W,Coal,2109.0,1970.0,2013,43.0,Brownfield,Full,,,,,,,,51.62361111111111,-1.2674999999999998,632.7,OSMnx
+Doncaster B,Doncaster,South Yorkshire,Yorkshire and the Humber,53°31′27″N 1°08′46″W,Coal,122.0,1953.0,1983,30.0,Brownfield,Partial,,,,,,,,53.524166666666666,-1.146111111111111,36.6,OSMnx
+Drakelow A,Burton upon Trent,Derbyshire,East Midlands,52°46′25″N 1°39′24″W,Coal,240.0,1955.0,1984,29.0,Redeveloped,Full,,,,,,,,52.77361111111111,-1.6566666666666665,72.0,OSMnx
+Drakelow B,Burton upon Trent,Derbyshire,East Midlands,52°46′25″N 1°39′24″W,Coal,480.0,1959.0,1993,34.0,Renewable energy site,Full,,,,,,,,52.77361111111111,-1.6566666666666665,144.0,OSMnx
+Drakelow C,Burton upon Trent,Derbyshire,East Midlands,52°46′25″N 1°39′24″W,Coal,1450.0,1964.0,2003,39.0,Passive rewilding and redevelopment,Passive rewilding,,,,,,,,52.77361111111111,-1.6566666666666665,435.0,OSMnx
+Dungeness A1,Dungeness,Kent,South East,50°54′50″N 0°57′50″E,Nuclear (magnox),285.0,1965.0,2006,41.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,50.913888888888884,0.9638888888888888,42.8,OSMnx
+Dungeness A2,Dungeness,Kent,South East,50°54′50″N 0°57′50″E,Nuclear (magnox),285.0,1965.0,2006,41.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,50.913888888888884,0.9638888888888888,42.8,OSMnx
+Dungeness B1,Dungeness,Kent,South East,50°54′50″N 0°57′50″E,Nuclear (AGR),660.0,1983.0,2021,38.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,50.913888888888884,0.9638888888888888,,estimated
+Dunston B,Dunston,Tyne and Wear,North East,54°57′02″N 1°39′26″W,Coal,300.0,1951.0,1981,30.0,Redeveloped,Partial,,,,,,,,54.95055555555556,-1.6572222222222222,90.0,OSMnx
+Earley[21],Earley,Berkshire,South East,,Diesel-fired gas turbine,111.0,1965.0,1982,17.0,Redeveloped,Partial,,,,,,,,,,,estimated
+East Yelland,Yelland,Devon,South West,,Coal,170.0,1955.0,1984,29.0,Brownfield,Partial,,,,,,,,,,51.0,OSMnx
+Eggborough,Eggborough,North Yorkshire,Yorkshire and the Humber,53°42′42″N 1°07′37″W,Coal,1960.0,1967.0,2018,51.0,Remediation,Partial,,,,,,,,53.711666666666666,-1.1269444444444445,588.0,OSMnx
+Elland,Elland,West Yorkshire,Yorkshire and the Humber,53°41′40″N 1°49′22″W,Coal,180.0,1959.0,1991,32.0,Redeveloped,Partial,,,,,,,,53.69444444444444,-1.8227777777777778,54.0,OSMnx
+Fawley,Fawley,Hampshire,South East,50°49′00″N 1°19′44″W,Oil,968.0,1971.0,2013,42.0,Brownfield,Full,,,,,,,,50.81666666666667,-1.3288888888888888,96.8,OSMnx
+Ferrybridge B,Ferrybridge,West Yorkshire,Yorkshire and the Humber,53°43′03″N 1°16′50″W,Coal,300.0,1959.0,1992,33.0,Brownfield,Full,,,,,,,,53.7175,-1.2805555555555554,90.0,OSMnx
+Ferrybridge C,Ferrybridge,West Yorkshire,Yorkshire and the Humber,53°43′03″N 1°16′50″W,Coal,2000.0,1966.0,2016,50.0,Brownfield,Full,,,,,,,,53.7175,-1.2805555555555554,600.0,OSMnx
+Fiddlers Ferry,Widnes – Warrington,Cheshire,North West,53°22′19″N 2°41′13″W,Coal,1989.0,1971.0,2020,49.0,Remediation then redevelopment,Partial,,,,,,,,53.371944444444445,-2.686944444444445,596.7,OSMnx
+Goldington,Bedford,Bedfordshire,East,52°08′15″N 0°25′39″W,Coal,180.0,1954.0,1983,29.0,Redeveloped,Partial,,,,,,,,52.1375,-0.4275,54.0,OSMnx
+Grain Oil,Grain,Kent,South East,51°26′43″N 0°42′54″E,Oil,1300.0,1979.0,2012,33.0,New energy site,Partial,,,,,,,,51.445277777777775,0.715,130.0,OSMnx
+Great Yarmouth B,Great Yarmouth,Norfolk,East,52°35′02″N 1°44′00″E,Oil,252.0,1958.0,1994,36.0,New energy site,Partial,,,,,,,,52.58388888888889,1.7333333333333334,25.2,OSMnx
+Hams Hall B,Birmingham,Warwickshire,West Midlands,52°31′29″N 1°42′19″W,Coal,306.0,1942.0,1981,39.0,Remediation then redevelopment,Full,,,,,,,,52.52472222222222,-1.7052777777777777,91.8,OSMnx
+Hams Hall C,Birmingham,Warwickshire,West Midlands,52°31′29″N 1°42′19″W,Coal,357.0,1958.0,1992,34.0,Remediation then rewilding,Full,,,,,,,,52.52472222222222,-1.7052777777777777,107.1,OSMnx
+High Marnham,Dunham,Nottinghamshire,East Midlands,53°13′44″N 0°47′33″W,Coal,945.0,1959.0,2003,44.0,Renewable energy site,Full,,,,,,,,53.22888888888889,-0.7925,283.5,OSMnx
+Hinkley Point A,Hinkley Point,Somerset,South West,51°12′31″N 3°08′01″W,Nuclear (magnox),470.0,1957.0,2000,43.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,51.20861111111111,-3.133611111111111,70.5,OSMnx
+Hinkley Point B,Hinkley Point,Somerset,South West,51°12′33″N 3°07′39″W,Nuclear (AGR),1220.0,1976.0,2022,46.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,51.20916666666667,-3.1275,,estimated
+Huddersfield[11],Huddersfield,West Yorkshire,North East,53°39′09″N 1°46′26″W,Coal,94.0,1893.0,1981,88.0,Redeveloped,Partial,,,,,,,,53.652499999999996,-1.7738888888888888,28.2,OSMnx
+Huncoat,Accrington,Lancashire,North West,53°46′34″N 2°20′16″W,Coal,150.0,1956.0,1984,28.0,Brownfield,Partial,,,,,,,,53.77611111111111,-2.3377777777777777,45.0,OSMnx
+Ince B,Ellesmere Port,Cheshire,North West,,Oil,1050.0,1984.0,1997,13.0,Redeveloped,Partial,,,,,,,,,,105.0,OSMnx
+Ironbridge A,Ironbridge,Shropshire,West Midlands,52°37′48″N 2°30′43″W,Coal,200.0,1932.0,1981,49.0,Passive rewilding,Passive rewilding,,,,,,,,52.63,-2.5119444444444445,60.0,OSMnx
+Ironbridge B,Ironbridge,Shropshire,West Midlands,52°37′48″N 2°30′43″W,Coal,1000.0,1969.0,2015,46.0,Remediation then redevelopment,Partial,,,,,,,,52.63,-2.5119444444444445,300.0,OSMnx
+Keadby Coal,Scunthorpe,North Lincolnshire,Yorkshire and the Humber,53°35′40″N 0°45′02″W,Coal,360.0,1952.0,1984,32.0,New energy site,Partial,,,,,,,,53.59444444444445,-0.7505555555555555,108.0,OSMnx
+Kingsnorth,Medway,Kent,South East,51°25′08″N 0°36′10″E,Coal,2000.0,1970.0,2012,42.0,Renewable energy site,Full,,,,,,,,51.41888888888889,0.6027777777777777,600.0,OSMnx
+Leicester[21],Leicester,Leicestershire,East Midlands,,OCGT,102.0,1976.0,1990,14.0,Redeveloped,Partial,,,,,,,,,,15.3,OSMnx
+Little Barford A,Little Barford,Bedfordshire,East,52°12′17″N 0°16′02″W,Coal,120.0,1939.0,1981,42.0,New energy site,Partial,,,,,,,,52.20472222222222,-0.2672222222222222,36.0,OSMnx
+Littlebrook C,Dartford,Kent,South East,51°27′55″N 0°14′30″E,Coal,240.0,1956.0,1981,25.0,Brownfield,Full,,,,,,,,51.46527777777778,0.24166666666666667,72.0,OSMnx
+Littlebrook D,Dartford,Kent,South East,51°27′55″N 0°14′30″E,Oil,1370.0,1981.0,2015,34.0,Brownfield,Full,,,,,,,,51.46527777777778,0.24166666666666667,137.0,OSMnx
+Lots Road,Lots Road,Chelsea,Greater London,51°28′40″N 0°10′53″W,Coal,1800.0,1905.0,2002,97.0,Redeveloped,Full,,,,,,,,51.47777777777778,-0.18138888888888888,540.0,OSMnx
+Marchwood A,Marchwood,Hampshire,South East,50°53′54″N 1°26′13″W,oil,480.0,1953.0,1984,31.0,New energy site,Partial,,,,,,,,50.89833333333333,-1.4369444444444444,,estimated
+Meaford B,Meaford,Staffordshire,West Midlands,52°55′33″N 2°09′59″W,Coal,240.0,1957.0,1991,34.0,Brownfield,Partial,,,,,,,,52.92583333333333,-2.1663888888888887,72.0,OSMnx
+Mexborough,Mexborough,South Yorkshire,Yorkshire and the Humber,53°29′37″N 1°15′49″W,Coal,120.0,1950.0,1981,31.0,Redeveloped,Partial,,,,,,,,53.493611111111115,-1.263611111111111,36.0,OSMnx
+North Tees C,Billingham,County Durham,North East,54°35′13″N 1°15′47″W,Coal,120.0,1949.0,1983,34.0,Brownfield,Partial,,,,,,,,54.58694444444445,-1.2630555555555556,36.0,OSMnx
+Northfleet[6],Gravesham,Kent,South East,,Coal,720.0,1963.0,1991,28.0,Redeveloped,Partial,,,,,,,,,,216.0,OSMnx
+Norwich[6],Norwich,Norfolk,East,52°37′15″N 1°19′06″E,Oil (gas turbine),110.0,1966.0,1986,20.0,Clean energy site,Partial,,,,,,,,52.62083333333334,1.3183333333333334,,estimated
+Nottingham[21],Nottingham,Nottinghamshire,East Midlands,52°55′55″N 1°10′01″W,Coal,148.0,1925.0,1981,56.0,Brownfield,Partial,,,,,,,,52.93194444444444,-1.1669444444444446,44.4,OSMnx
+Oldbury nuclear power station,Oldbury,South Gloucestershire,South West,51°38′56″N 2°34′15″W,Nuclear (magnox),470.0,1967.0,2012,45.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,51.64888888888889,-2.5708333333333333,70.5,OSMnx
+Padiham B,Padiham,Lancashire,North West,53°47′44″N 2°19′39″W,Coal,240.0,1957.0,1993,36.0,Remediation then rewilding,Partial,,,,,,,,53.79555555555555,-2.3274999999999997,72.0,OSMnx
+Portishead B,Portishead,Somerset,South West,51°29′28″N 2°45′18″W,Oil,298.0,1955.0,1982,27.0,Redeveloped,Full,,,,,,,,51.49111111111111,-2.755,29.8,OSMnx
+Portrack,Billingham,County Durham,North East,54°34′16″N 1°16′00″W,Waste,20.0,1977.0,1996,19.0,Redeveloped,Partial,,,,,,,,54.571111111111115,-1.2666666666666666,,estimated
+Ratcliffe-on-Soar,Ratcliffe-on-Soar,Nottinghamshire,East Midlands,52°51′55″N 1°15′18″W,Coal,2021.0,1968.0,2024,56.0,Brownfield,Full,,,,,,,,52.86527777777778,-1.255,606.3,OSMnx
+Richborough,Richborough,Kent,South East,51°18′36″N 1°20′55″E,Coal+oil,360.0,1962.0,1996,34.0,New energy site,Partial,,,,,,,,51.309999999999995,1.348611111111111,108.0,OSMnx
+Roosecote A,Roosecote,Cumbria,North West,54°06′18″N 3°11′16″W,Coal,120.0,1954.0,1986,32.0,Clean energy site,Partial,,,,,,,,54.105000000000004,-3.1877777777777774,36.0,OSMnx
+Roosecote B,Roosecote,Cumbria,North West,54°06′18″N 3°11′16″W,CCGT,229.0,1991.0,2012,21.0,Clean energy site,Partial,,,,,,,,54.105000000000004,-3.1877777777777774,17.2,OSMnx
+Rugeley A,Rugeley,Staffordshire,West Midlands,52°45′25″N 1°54′59″W,Coal,600.0,1963.0,1995,32.0,Remediation then clean redevelopment,Full,,,,,,,,52.75694444444444,-1.9163888888888887,180.0,OSMnx
+Rugeley B,Rugeley,Staffordshire,West Midlands,52°45′25″N 1°54′59″W,Coal,1006.0,1970.0,2016,46.0,Remediation then redevelopment,Full,,,,,,,,52.75694444444444,-1.9163888888888887,301.8,OSMnx
+Rye House A,Hoddesdon,Hertfordshire,East,51°45′45″N 0°00′39″E,Coal,120.0,1953.0,1982,29.0,New energy site,Partial,,,,,,,,51.7625,0.010833333333333334,37.0,OSMnx
+Sizewell A,Sizewell,Suffolk,East,52°12′54″N 1°37′11″E,Nuclear (magnox),650.0,1966.0,2006,40.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,52.215,1.6197222222222223,97.5,OSMnx
+Skelton Grange A,Leeds,West Yorkshire,Yorkshire and the Humber,,Coal,360.0,1948.0,1983,35.0,Clean energy site,Partial,,,,,,,,,,108.0,OSMnx
+Skelton Grange B,Leeds,West Yorkshire,Yorkshire and the Humber,,Coal,448.0,1960.0,1994,34.0,Clean energy site,Partial,,,,,,,,,,134.4,OSMnx
+Spondon[38][39][11],Spondon,Derbyshire,East Midlands,52°54′23″N 1°24′03″W,Coal,18.0,1920.0,1982,62.0,Partially Demolished,Partial,,,,,,,,52.906388888888884,-1.4008333333333332,5.4,OSMnx
+Staythorpe A,Southwell,Nottinghamshire,East Midlands,53°04′29″N 0°51′21″W,Coal,112.0,1950.0,1983,33.0,New energy site,Partial,,,,,,,,53.07472222222223,-0.8558333333333333,19.4,OSMnx
+Staythorpe B,Southwell,Nottinghamshire,East Midlands,53°04′29″N 0°51′21″W,Coal,354.0,1962.0,1994,32.0,New energy site,Partial,,,,,,,,53.07472222222223,-0.8558333333333333,106.2,OSMnx
+Stella North,Lemington,Tyne and Wear,North East,54°58′27″N 1°43′33″W,Coal,240.0,1954.0,1991,37.0,Redeveloped,Partial,,,,,,,,54.97416666666667,-1.7258333333333336,72.0,OSMnx
+Stella South,Blaydon,Tyne and Wear,North East,54°58′27″N 1°43′33″W,Coal,300.0,1954.0,1991,37.0,Redeveloped,Partial,,,,,,,,54.97416666666667,-1.7258333333333336,90.0,OSMnx
+Stourport B[21],Stourport,Worcestershire,West Midlands,,Coal,112.0,1950.0,1984,34.0,Redeveloped,Partial,,,,,,,,,,33.6,OSMnx
+Teesside,Wilton,Redcar and Cleveland,North East,54°34′37″N 1°07′14″W,CCGT,1875.0,1993.0,2013,20.0,Brownfield,Partial,,,,,,,,54.57694444444445,-1.1205555555555555,140.6,OSMnx
+Thornhill[11],Dewsbury,West Yorkshire,North East,53°40′38″N 1°39′17″W,Coal,186.0,1902.0,1982,80.0,New energy site,Partial,,,,,,,,53.67722222222222,-1.6547222222222222,55.8,OSMnx
+Thorpe Marsh,Doncaster,South Yorkshire,Yorkshire and the Humber,53°34′50″N 1°05′07″W,Coal,1100.0,1963.0,1994,31.0,Remediation,Partial,,,,,,,,53.580555555555556,-1.0852777777777778,330.0,OSMnx
+Tilbury A,Tilbury,"Thurrock, Essex",East,51°27′18″N 0°23′30″E,Oil,360.0,1956.0,1981,25.0,Clean energy site,Partial,,,,,,,,51.455000000000005,0.3916666666666667,36.0,OSMnx
+Tilbury B,Tilbury,"Thurrock, Essex",East,51°27′18″N 0°23′30″E,Coal+oil+biofuel,1131.0,1967.0,2013,46.0,Clean energy site,Partial,,,,,,,,51.455000000000005,0.3916666666666667,339.3,OSMnx
+Wakefield B,Wakefield,West Yorkshire,Yorkshire and the Humber,53°40′25″N 1°28′24″W,Coal,224.0,1957.0,1991,34.0,Redeveloped,Partial,,,,,,,,53.67361111111111,-1.4733333333333334,67.2,OSMnx
+Walsall[21] (Birchills),Walsall,Birmingham,West Midlands,,Coal,191.0,1949.0,1982,33.0,Clean energy site,Partial,,,,,,,,,,57.3,OSMnx
+Watford,Watford,Hertfordshire,East,51°38′34″N 0°24′16″W,Coal,27.0,1899.0,1990,91.0,Redeveloped,Partial,,,,,,,,51.64277777777778,-0.40444444444444444,8.1,OSMnx
+West Burton A,Bole,Nottinghamshire,East Midlands,53°21′54″N 0°49′10″W,Coal,1972.0,1967.0,2023,56.0,Brownfield,Partial,,,,,,,,53.365,-0.8194444444444444,591.6,OSMnx
+West Ham,Canning Town,London,Greater London,51°31′05″N 0°00′05″E,Coal,114.0,1904.0,1983,79.0,Redeveloped,Partial,,,,,,,,51.518055555555556,0.001388888888888889,34.2,OSMnx
+West Thurrock,West Thurrock,Essex,East,51°28′10″N 0°17′20″E,Coal,1300.0,1962.0,1993,31.0,Redeveloped,Partial,,,,,,,,51.46944444444445,0.28888888888888886,390.0,OSMnx
+Wilford,Wilford,Nottinghamshire,East Midlands,52°55′55″N 1°10′01″W,Coal,316.0,1925.0,1981,56.0,Redeveloped,Partial,,,,,,,,52.93194444444444,-1.1669444444444446,94.8,OSMnx
+Willington A,Willington,Derbyshire,East Midlands,52°51′14″N 1°33′54″W,Coal,400.0,1957.0,1990,33.0,Redeveloped,Partial,,,,,,,,52.85388888888889,-1.565,120.0,OSMnx
+Willington B[49],Willington,Derbyshire,East Midlands,52°51′14″N 1°33′54″W,Coal,400.0,1960.0,1990,30.0,Redeveloped,Partial,,,,,,,,52.85388888888889,-1.565,120.0,OSMnx
+Winfrith,Winfrith Newburgh,Dorset,South West,50°40′55″N 2°15′40″W,Nuclear,100.0,1968.0,1990,22.0,"Decomissioning, restricted site",Partial (nuclear),,,,,,,,50.68194444444444,-2.261111111111111,,estimated

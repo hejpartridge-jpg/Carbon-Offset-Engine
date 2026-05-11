@@ -1,0 +1,11 @@
+Fuel,CHP,Emissions Intensity kg CO2e / tonne,Load Factor,Transport Emissions (tonnes),CV (KWh/Kg)
+Coal,No,2250.22000,0.65,390.06647,6.78000
+Natural Gas,No,2563.12000,0.58,423.16368,12.67400
+MSW,No,1.26431,0.8,102.85714,3.41700
+Diesel/Gas Oil,No,3164.33000,0.18,714.86545,11.95200
+Sour Gas,No,2563.12000,0.6,423.16368,12.67400
+Solar,No,0,0.25,0,0
+Wind,No,0,0.4,0,0
+Hydro,No,0,0.5,0,0
+Biomass,No,54.33654,0.73,177.00000,4.80000
+Nuclear,No,0,0.88,0,0
