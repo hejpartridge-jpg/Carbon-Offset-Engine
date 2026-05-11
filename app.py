@@ -45,6 +45,7 @@ ml_model, model_metrics = load_models()
 
 # ── Constants ─────────────────────────────────────────────────
 ECOSYSTEM_VALUE_PER_HA_YR = 7500
+CURRENT_YEAR = 2026
 
 HABITAT_QUALITY_FACTOR = {
     "Solar":   0.3,
@@ -81,43 +82,54 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
         return None
     hab = hab.iloc[0]
     spe = spe.iloc[0]
-    lat                 = hab["lat"]
-    lon                 = hab["lon"]
-    years_since_closure = 2026 - closure_year
-    years_operational   = closure_year - opening_year
-    site_ha             = plant_row["site_ha"] if pd.notna(plant_row["site_ha"]) else 20
-    species_before      = spe["species_before"]  if pd.notna(spe["species_before"])  else 150
-    rainfall            = spe["annual_rainfall"]  if pd.notna(spe["annual_rainfall"]) else 800
-    dist_any            = hab["dist_any_intact_km"] if pd.notna(hab["dist_any_intact_km"]) else 2.0
-    dist_1ha            = hab["dist_1ha_patch_km"]  if pd.notna(hab["dist_1ha_patch_km"])  else 2.0
-    dist_5ha            = hab["dist_5ha_patch_km"]  if pd.notna(hab["dist_5ha_patch_km"])  else 4.0
-    if years_since_closure < 3:
-        return {
-            "species_5yr": species_before, "species_10yr": species_before,
-            "species_before": species_before, "lat": lat, "lon": lon,
-            "rainfall": rainfall, "dist_1ha": dist_1ha,
-            "years_operational": years_operational, "prediction_reliable": False,
-        }
-    input_data = pd.DataFrame([{
-        "Years Operational":           years_operational,
-        "Site Area (ha)":              site_ha,
-        "annual_rainfall_mm":          rainfall,
-        "species_before":              species_before,
-        "dist_any_intact_closure_km":  dist_any,
-        "dist_1ha_patch_closure_km":   dist_1ha,
-        "dist_5ha_patch_closure_km":   dist_5ha,
-        "lat": lat, "lon": lon,
-        "years_since_closure":         years_since_closure,
-    }])
-    prediction = ml_model.predict(input_data)[0]
+    lat               = hab["lat"]
+    lon               = hab["lon"]
+    years_operational = closure_year - opening_year
+    site_ha           = plant_row["site_ha"] if pd.notna(plant_row["site_ha"]) else 20
+    species_before    = spe["species_before"]  if pd.notna(spe["species_before"])  else 150
+    rainfall          = spe["annual_rainfall"]  if pd.notna(spe["annual_rainfall"]) else 800
+    dist_any          = hab["dist_any_intact_km"] if pd.notna(hab["dist_any_intact_km"]) else 2.0
+    dist_1ha          = hab["dist_1ha_patch_km"]  if pd.notna(hab["dist_1ha_patch_km"])  else 2.0
+    dist_5ha          = hab["dist_5ha_patch_km"]  if pd.notna(hab["dist_5ha_patch_km"])  else 4.0
+
+    # predict from NOW not from closure
+    # so if plant closes in 2027:
+    #   5yr window  = 2031 → years_since_closure = 2031 - 2027 = 4
+    #   10yr window = 2036 → years_since_closure = 2036 - 2027 = 9
+    years_since_5yr  = max(1, (CURRENT_YEAR + 5)  - closure_year)
+    years_since_10yr = max(1, (CURRENT_YEAR + 10) - closure_year)
+
+    def predict_at(years_since):
+        input_data = pd.DataFrame([{
+            "Years Operational":           years_operational,
+            "Site Area (ha)":              site_ha,
+            "annual_rainfall_mm":          rainfall,
+            "species_before":              species_before,
+            "dist_any_intact_closure_km":  dist_any,
+            "dist_1ha_patch_closure_km":   dist_1ha,
+            "dist_5ha_patch_closure_km":   dist_5ha,
+            "lat":                         lat,
+            "lon":                         lon,
+            "years_since_closure":         years_since,
+        }])
+        return ml_model.predict(input_data)[0]
+
+    pred_5yr  = predict_at(years_since_5yr)
+    pred_10yr = predict_at(years_since_10yr)
+
     return {
-        "species_5yr":         max(species_before, prediction[0]),
-        "species_10yr":        max(species_before, prediction[1]),
-        "species_before":      species_before,
-        "lat": lat, "lon": lon,
-        "rainfall": rainfall, "dist_1ha": dist_1ha,
-        "years_operational":   years_operational,
-        "prediction_reliable": True,
+        "species_5yr":          max(species_before, pred_5yr[0]),
+        "species_10yr":         max(species_before, pred_10yr[1]),
+        "species_before":       species_before,
+        "prediction_year_5yr":  CURRENT_YEAR + 5,
+        "prediction_year_10yr": CURRENT_YEAR + 10,
+        "not_yet_closed":       closure_year > CURRENT_YEAR,
+        "lat":                  lat,
+        "lon":                  lon,
+        "rainfall":             rainfall,
+        "dist_1ha":             dist_1ha,
+        "years_operational":    years_operational,
+        "prediction_reliable":  True,
     }
 
 def calculate_species_roi(prediction, plant_row):
@@ -187,8 +199,8 @@ st.markdown("---")
 st.sidebar.header("Plant Selection")
 plant_names    = sorted(official["Site Name"].dropna().unique().tolist())
 selected_plant = st.sidebar.selectbox("Select a power plant", plant_names)
-opening_year   = st.sidebar.number_input("Year plant opened",              min_value=1900, max_value=2030, value=1970)
-closure_year   = st.sidebar.number_input("Year plant closed / will close", min_value=1900, max_value=2030, value=2025)
+opening_year   = st.sidebar.number_input("Year plant opened",              min_value=1900, max_value=2050, value=1970)
+closure_year   = st.sidebar.number_input("Year plant closed / will close", min_value=1900, max_value=2050, value=2025)
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     f"**ML Model performance:**\n"
@@ -228,11 +240,16 @@ if st.sidebar.button("Calculate ROI", type="primary"):
             results[renewable] = {**roi, "bio_impact": bio_impact,
                                   "species_value": species_annual, "total_annual": total}
 
-    if prediction and not prediction.get("prediction_reliable", True):
-        st.warning("⚠️ Plant closed too recently for reliable species prediction. Showing baseline.")
-
     # ── Plant info ────────────────────────────────────────────
     st.header(f"📍 {selected_plant}")
+
+    if prediction and prediction.get("not_yet_closed"):
+        st.info(
+            f"ℹ️ {selected_plant} is scheduled to close in {closure_year}. "
+            f"Species predictions show recovery by "
+            f"{prediction['prediction_year_5yr']} and {prediction['prediction_year_10yr']}."
+        )
+
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Capacity",          f"{capacity_mw:.0f} MW")
     col2.metric("Fuel Type",         struct_row["Primary Fuel"])
@@ -245,15 +262,7 @@ if st.sidebar.button("Calculate ROI", type="primary"):
     # ═══════════════════════════════════════════════════════════
     st.header("📊 Individual Environmental Metrics")
 
-    years      = list(range(1, 21))
-    bar_colors = {
-        "fossil": "#e74c3c",
-        "Solar":  "#f39c12",
-        "Wind":   "#2ecc71",
-        "Hydro":  "#3498db",
-        "Nuclear":"#9b59b6",
-        "Biomass":"#e74c3c",
-    }
+    years = list(range(1, 21))
 
     # ── CO2 chart ─────────────────────────────────────────────
     st.subheader("CO2 Emissions")
@@ -293,7 +302,7 @@ if st.sidebar.button("Calculate ROI", type="primary"):
     water_colors = ["#e74c3c"] + ["#9b59b6"] * 5
 
     fig_water, ax_water = plt.subplots(figsize=(10, 5))
-    bars = ax_water.bar(water_labels, water_values, color=water_colors, edgecolor="white")
+    ax_water.bar(water_labels, water_values, color=water_colors, edgecolor="white")
     ax_water.set_title(f"Water Savings — {selected_plant}")
     ax_water.set_ylabel("Litres per year")
     ax_water.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x/1e9:.2f}B"))
@@ -396,7 +405,6 @@ if st.sidebar.button("Calculate ROI", type="primary"):
     plt.tight_layout()
     st.pyplot(fig_payback)
 
-    # payback years table
     payback_data = {}
     for renewable in RENEWABLES:
         payback = next(
@@ -415,7 +423,6 @@ if st.sidebar.button("Calculate ROI", type="primary"):
     # ═══════════════════════════════════════════════════════════
     st.header("💰 Net Environmental ROI")
 
-    # ── Summary table ─────────────────────────────────────────
     st.subheader("Annual Environmental Value by Renewable Type")
     table_data = {
         "": ["CO2 savings", "Water savings", "NOX savings", "SOX savings",
@@ -447,7 +454,6 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         ]
     st.dataframe(pd.DataFrame(table_data).set_index(""), use_container_width=True)
 
-    # ── Net annual bar chart ───────────────────────────────────
     st.subheader("Net Annual Environmental Value")
     x_labels  = ["Close\nOnly"] + RENEWABLES
     x_pos     = range(len(x_labels))
@@ -479,7 +485,6 @@ if st.sidebar.button("Calculate ROI", type="primary"):
     plt.tight_layout()
     st.pyplot(fig_net)
 
-    # ── 20 year cumulative ────────────────────────────────────
     st.subheader("20 Year Cumulative Environmental ROI")
 
     if prediction and species_roi:
@@ -535,6 +540,8 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         sp_before  = prediction["species_before"]
         sp_5yr     = prediction["species_5yr"]
         sp_10yr    = prediction["species_10yr"]
+        yr5_label  = prediction["prediction_year_5yr"]
+        yr10_label = prediction["prediction_year_10yr"]
         site_ha_v  = plant_row["site_ha"] if pd.notna(plant_row["site_ha"]) else 10
         if sp_before == 0: sp_before = 1
         uplift_5yr  = max(0, (sp_5yr  - sp_before) / sp_before)
@@ -555,22 +562,27 @@ if st.sidebar.button("Calculate ROI", type="primary"):
             else:
                 trajectory.append(sp_10yr)
 
-        ax_sp.plot(years, trajectory, color="#2ecc71", linewidth=2.5)
+        # x axis shows actual calendar years from now
+        calendar_years = [CURRENT_YEAR + y for y in years]
+
+        ax_sp.plot(calendar_years, trajectory, color="#2ecc71", linewidth=2.5)
         ax_sp.axhline(sp_before, color="#e74c3c", linewidth=1.5, linestyle="--",
                       label=f"Baseline ({sp_before:.0f} species)")
-        ax_sp.scatter([5, 10], [sp_5yr, sp_10yr], color="#2ecc71", s=80, zorder=5)
-        ax_sp.annotate(f"{sp_5yr:.0f}", xy=(5, sp_5yr), xytext=(5.3, sp_5yr),
+        ax_sp.scatter([yr5_label, yr10_label], [sp_5yr, sp_10yr],
+                      color="#2ecc71", s=80, zorder=5)
+        ax_sp.annotate(f"{sp_5yr:.0f} species ({yr5_label})",
+                       xy=(yr5_label, sp_5yr), xytext=(yr5_label + 0.3, sp_5yr),
                        fontsize=9, fontweight="bold", color="#2ecc71")
-        ax_sp.annotate(f"{sp_10yr:.0f}", xy=(10, sp_10yr), xytext=(10.3, sp_10yr),
+        ax_sp.annotate(f"{sp_10yr:.0f} species ({yr10_label})",
+                       xy=(yr10_label, sp_10yr), xytext=(yr10_label + 0.3, sp_10yr),
                        fontsize=9, fontweight="bold", color="#2ecc71")
-        ax_sp.fill_between(years, sp_before, trajectory, alpha=0.15,
+        ax_sp.fill_between(calendar_years, sp_before, trajectory, alpha=0.15,
                            color="#2ecc71", label="Species gained")
-        ax_sp.set_xlabel("Years since closure", fontsize=11)
+        ax_sp.set_xlabel("Year", fontsize=11)
         ax_sp.set_ylabel("Predicted species count", fontsize=11)
         ax_sp.set_title("Predicted Species Recovery Trajectory")
         ax_sp.legend(fontsize=9)
         ax_sp.grid(alpha=0.3)
-        ax_sp.set_xlim(1, 20)
         r2_5  = model_metrics["species_5yr"]["r2"]
         r2_10 = model_metrics["species_10yr"]["r2"]
         ax_sp.text(0.02, 0.02,
@@ -583,38 +595,36 @@ if st.sidebar.button("Calculate ROI", type="primary"):
             running += ann_5 if year <= 5 else ann_10
             sp_cumulative.append(running / 1e3)
 
-        ax_val.plot(years, sp_cumulative, color="#f1c40f", linewidth=2.5)
-        ax_val.axvline(5, color="#2ecc71", linewidth=1.5, linestyle="--",
-                       alpha=0.7, label="Year 5 — recovery accelerates")
-        ax_val.fill_between(years, 0, sp_cumulative, alpha=0.15, color="#f1c40f")
-        ax_val.annotate(f"£{sp_cumulative[4]:,.0f}k", xy=(5, sp_cumulative[4]),
-                        xytext=(5.3, sp_cumulative[4]), fontsize=9,
-                        fontweight="bold", color="#f1c40f")
-        ax_val.annotate(f"£{sp_cumulative[-1]:,.0f}k", xy=(20, sp_cumulative[-1]),
-                        xytext=(17, sp_cumulative[-1] * 0.95), fontsize=9,
-                        fontweight="bold", color="#f1c40f")
-        ax_val.set_xlabel("Years since closure", fontsize=11)
+        ax_val.plot(calendar_years, sp_cumulative, color="#f1c40f", linewidth=2.5)
+        ax_val.axvline(yr5_label, color="#2ecc71", linewidth=1.5, linestyle="--",
+                       alpha=0.7, label=f"{yr5_label} — recovery accelerates")
+        ax_val.fill_between(calendar_years, 0, sp_cumulative, alpha=0.15, color="#f1c40f")
+        ax_val.annotate(f"£{sp_cumulative[4]:,.0f}k",
+                        xy=(yr5_label, sp_cumulative[4]),
+                        xytext=(yr5_label + 0.3, sp_cumulative[4]),
+                        fontsize=9, fontweight="bold", color="#f1c40f")
+        ax_val.annotate(f"£{sp_cumulative[-1]:,.0f}k",
+                        xy=(calendar_years[-1], sp_cumulative[-1]),
+                        xytext=(calendar_years[-3], sp_cumulative[-1] * 0.95),
+                        fontsize=9, fontweight="bold", color="#f1c40f")
+        ax_val.set_xlabel("Year", fontsize=11)
         ax_val.set_ylabel("Cumulative Species Value (£ thousands)", fontsize=11)
         ax_val.set_title("Cumulative Ecosystem Service Value\nfrom Species Recovery")
         ax_val.legend(fontsize=9)
         ax_val.grid(alpha=0.3)
-        ax_val.set_xlim(1, 20)
         ax_val.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"£{x:,.0f}k"))
         plt.tight_layout()
         st.pyplot(fig_eco)
 
         col1, col2, col3 = st.columns(3)
-        col1.metric("Baseline Species",  f"{sp_before:.0f}")
-        col2.metric("Predicted Year 5",  f"{sp_5yr:.0f}")
-        col3.metric("Predicted Year 10", f"{sp_10yr:.0f}")
+        col1.metric("Baseline Species",       f"{sp_before:.0f}")
+        col2.metric(f"Predicted {yr5_label}", f"{sp_5yr:.0f}")
+        col3.metric(f"Predicted {yr10_label}",f"{sp_10yr:.0f}")
 
-        if not prediction.get("prediction_reliable", True):
-            st.info("ℹ️ Species predictions unreliable — plant closed too recently.")
-        else:
-            st.caption(
-                f"⚠️ Species predictions based on 89 historical UK power station sites. "
-                f"R²={r2_10:.2f}. Use as directional indicator only."
-            )
+        st.caption(
+            f"⚠️ Species predictions based on 89 historical UK power station sites. "
+            f"R²={r2_10:.2f}. Use as directional indicator only."
+        )
     else:
         st.info("No species prediction available for this plant.")
 
