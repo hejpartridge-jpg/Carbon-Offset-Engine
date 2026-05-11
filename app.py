@@ -121,9 +121,10 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
 
     # predict from whichever is later — now or closure date
     # ensures every plant gets a genuine 5 and 10 year recovery window
-    effective_start  = max(CURRENT_YEAR, closure_year)
-    years_since_5yr  = (effective_start + 5)  - closure_year
-    years_since_10yr = (effective_start + 10) - closure_year
+    # predict recovery 5 and 10 years after closure
+    # regardless of when that closure happens
+    years_since_5yr  = 5
+    years_since_10yr = 10
 
     def predict_at(years_since):
         input_data = pd.DataFrame([{
@@ -147,8 +148,8 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
         "species_5yr":          max(species_before, pred_5yr[0]),
         "species_10yr":         max(species_before, pred_10yr[1]),
         "species_before":       species_before,
-        "prediction_year_5yr":  effective_start + 5,
-        "prediction_year_10yr": effective_start + 10,
+        "prediction_year_5yr":  closure_year + 5,
+        "prediction_year_10yr": closure_year + 10,
         "not_yet_closed":       closure_year > CURRENT_YEAR,
         "lat":                  lat,
         "lon":                  lon,
@@ -592,7 +593,8 @@ if st.sidebar.button("Calculate ROI", type="primary"):
             else:
                 trajectory.append(sp_10yr)
 
-        calendar_years = [CURRENT_YEAR + y for y in years]
+        start_year     = max(CURRENT_YEAR, closure_year)
+        calendar_years = [start_year + y for y in years]
 
         ax_sp.plot(calendar_years, trajectory, color="#2ecc71", linewidth=2.5)
         ax_sp.axhline(sp_before, color="#e74c3c", linewidth=1.5, linestyle="--",
