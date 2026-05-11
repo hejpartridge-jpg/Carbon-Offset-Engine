@@ -681,7 +681,7 @@ if st.sidebar.button("Calculate ROI", type="primary"):
 
         ax_val.plot(calendar_years, sp_cumulative, color="#f1c40f", linewidth=2.5)
         ax_val.axvline(yr5_label, color="#2ecc71", linewidth=1.5, linestyle="--",
-                       alpha=0.7, label=f"{yr5_label} — recovery accelerates")
+                       alpha=0.7, label=f"{yr5_label} — 5yr prediction point")
         ax_val.fill_between(calendar_years, 0, sp_cumulative, alpha=0.15, color="#f1c40f")
         ax_val.annotate(f"£{sp_cumulative[4]:,.0f}k",
                         xy=(yr5_label, sp_cumulative[4]),
