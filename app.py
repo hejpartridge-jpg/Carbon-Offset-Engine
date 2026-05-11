@@ -39,8 +39,6 @@ ml_model, model_metrics = load_models()
 
 ECOSYSTEM_VALUE_PER_HA_YR = 7500
 CURRENT_YEAR              = 2026
-BLEND_THRESHOLD           = 15
-RECOVERY_RATE_PER_YEAR    = 0.025
 
 HABITAT_QUALITY_FACTOR = {
     "Solar": 0.3, "Wind": 0.7, "Hydro": 0.5, "Nuclear": 0.2, "Biomass": 0.1,
@@ -86,9 +84,13 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
         return {
             "species_5yr":          species_before,
             "species_10yr":         species_before,
+            "species_15yr":         species_before,
+            "species_20yr":         species_before,
             "species_before":       species_before,
             "prediction_year_5yr":  closure_year + 5,
             "prediction_year_10yr": closure_year + 10,
+            "prediction_year_15yr": closure_year + 15,
+            "prediction_year_20yr": closure_year + 20,
             "not_yet_closed":       closure_year > CURRENT_YEAR,
             "lat": lat, "lon": lon,
             "rainfall": rainfall, "dist_1ha": None,
@@ -104,13 +106,12 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
     dist_1ha = dist_1ha if dist_1ha is not None else 2.0
     dist_5ha = dist_5ha if dist_5ha is not None else 4.0
 
-    # ── prediction logic ──────────────────────────────────────
-    # always predict 5 and 10 years after closure
-    # use simple recovery if < BLEND_THRESHOLD, ML if >= BLEND_THRESHOLD
     def simple_recovery(years_since):
-        return species_before * (1 + RECOVERY_RATE_PER_YEAR * years_since)
+        """2.5%/yr linear recovery — Natural England guidance"""
+        return species_before * (1 + 0.025 * years_since)
 
-    def ml_recovery(years_since):
+    def predict_at(years_since):
+        """Call ML model with years_since_closure as context"""
         input_data = pd.DataFrame([{
             "Years Operational":           years_operational,
             "Site Area (ha)":              site_ha,
@@ -119,42 +120,45 @@ def predict_species_recovery(plant_row, opening_year, closure_year):
             "dist_any_intact_closure_km":  dist_any,
             "dist_1ha_patch_closure_km":   dist_1ha,
             "dist_5ha_patch_closure_km":   dist_5ha,
-            "lat": lat, "lon": lon,
+            "lat":                         lat,
+            "lon":                         lon,
             "years_since_closure":         years_since,
         }])
         return ml_model.predict(input_data)[0]
 
-    def best_prediction(years_since, idx):
-        if years_since < BLEND_THRESHOLD:
-            return simple_recovery(years_since)
-        ml_pred = ml_recovery(years_since)[idx]
-        if ml_pred > species_before * 0.8:
-            return max(species_before, ml_pred)
-        return simple_recovery(years_since)
+    # ── years 5 and 10 — simple 2.5%/yr recovery ─────────────
+    # ML model is unreliable at short post-closure windows
+    sp_5yr  = simple_recovery(5)
+    sp_10yr = simple_recovery(10)
 
-    # 5yr and 10yr predictions are always relative to closure
-    sp_5yr  = best_prediction(5,  0)
-    sp_10yr = best_prediction(10, 1)
+    # ── years 15 and 20 — ML model ────────────────────────────
+    # call model once with years_since_closure=15
+    # pred[0] = species_5yr output  → anchor at closure + 15
+    # pred[1] = species_10yr output → anchor at closure + 20
+    ml_pred = predict_at(15)
+    ml_15yr = ml_pred[0]
+    ml_20yr = ml_pred[1]
 
-    # determine method label
-    method = "simple_recovery"
-    if 5 >= BLEND_THRESHOLD and 10 >= BLEND_THRESHOLD:
-        method = "ml_model"
-    elif 5 >= BLEND_THRESHOLD or 10 >= BLEND_THRESHOLD:
-        method = "mixed"
+    # sanity check — fall back to simple if ML gives bad result
+    sp_15yr = max(sp_10yr, ml_15yr) if ml_15yr > species_before * 0.8 else simple_recovery(15)
+    sp_20yr = max(sp_15yr, ml_20yr) if ml_20yr > species_before * 0.8 else simple_recovery(20)
 
     return {
         "species_5yr":          sp_5yr,
         "species_10yr":         sp_10yr,
+        "species_15yr":         sp_15yr,
+        "species_20yr":         sp_20yr,
         "species_before":       species_before,
         "prediction_year_5yr":  closure_year + 5,
         "prediction_year_10yr": closure_year + 10,
+        "prediction_year_15yr": closure_year + 15,
+        "prediction_year_20yr": closure_year + 20,
         "not_yet_closed":       closure_year > CURRENT_YEAR,
         "lat": lat, "lon": lon,
         "rainfall": rainfall, "dist_1ha": dist_1ha,
         "years_operational":    years_operational,
         "prediction_reliable":  True,
-        "method":               method,
+        "method":               "simple_to_10yr_then_ml",
         "reason":               None,
     }
 
@@ -267,7 +271,7 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         st.info(
             f"ℹ️ {selected_plant} is scheduled to close in {closure_year}. "
             f"Species predictions show recovery by "
-            f"{prediction['prediction_year_5yr']} and {prediction['prediction_year_10yr']}."
+            f"{prediction['prediction_year_15yr']} and {prediction['prediction_year_20yr']}."
         )
 
     col1, col2, col3, col4 = st.columns(4)
@@ -298,15 +302,15 @@ if st.sidebar.button("Calculate ROI", type="primary"):
     st.pyplot(fig_co2)
 
     st.subheader("Water Consumption")
-    water_labels = ["Total\n(current)", "Solar\nsaving", "Wind\nsaving",
-                    "Hydro\nsaving", "Nuclear\nsaving", "Biomass\nsaving"]
     water_values = [
         struct_row["Water_Consumption litres/yr"], struct_row["Water_Solar saving"],
         struct_row["Water_Wind saving"], struct_row["Water_Hydro saving"],
         struct_row["Water_Nuclear saving"], struct_row["Water_Biomass saving"],
     ]
     fig_water, ax_water = plt.subplots(figsize=(10, 5))
-    ax_water.bar(water_labels, water_values, color=["#e74c3c"]+["#9b59b6"]*5, edgecolor="white")
+    ax_water.bar(["Total\n(current)", "Solar\nsaving", "Wind\nsaving",
+                  "Hydro\nsaving", "Nuclear\nsaving", "Biomass\nsaving"],
+                 water_values, color=["#e74c3c"]+["#9b59b6"]*5, edgecolor="white")
     ax_water.set_title(f"Water Savings — {selected_plant}")
     ax_water.set_ylabel("Litres per year")
     ax_water.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x/1e9:.2f}B"))
@@ -416,11 +420,11 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         for v in [results[r]["total_annual"] for r in RENEWABLES]
     ]
     fig_net, ax_net = plt.subplots(figsize=(10, 6))
-    bars = ax_net.bar(range(len(["Close\nOnly"]+RENEWABLES)), net_m, 0.6, color=colours, alpha=0.9)
+    bars = ax_net.bar(range(6), net_m, 0.6, color=colours, alpha=0.9)
     for bar, val in zip(bars, net_m):
         ax_net.text(bar.get_x() + bar.get_width()/2, bar.get_height() + max(net_m)*0.01,
                     f"£{val:.1f}M", ha="center", va="bottom", fontsize=9, fontweight="bold")
-    ax_net.set_xticks(range(len(["Close\nOnly"]+RENEWABLES)))
+    ax_net.set_xticks(range(6))
     ax_net.set_xticklabels(["Close\nOnly"]+RENEWABLES, fontsize=10)
     ax_net.set_ylabel("Net Annual Value (£ millions)")
     ax_net.set_title(f"Net Annual Environmental Value — {selected_plant}\n(green = better than close only)")
@@ -484,21 +488,20 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         sp_before  = prediction["species_before"]
         sp_5yr     = prediction["species_5yr"]
         sp_10yr    = prediction["species_10yr"]
-        yr5_label  = prediction["prediction_year_5yr"]   # closure_year + 5
-        yr10_label = prediction["prediction_year_10yr"]  # closure_year + 10
-        method     = prediction.get("method", "simple_recovery")
+        sp_15yr    = prediction["species_15yr"]
+        sp_20yr    = prediction["species_20yr"]
+        yr5_label  = prediction["prediction_year_5yr"]
+        yr10_label = prediction["prediction_year_10yr"]
+        yr15_label = prediction["prediction_year_15yr"]
+        yr20_label = prediction["prediction_year_20yr"]
         site_ha_v  = plant_row["site_ha"] if pd.notna(plant_row["site_ha"]) else 10
         if sp_before == 0: sp_before = 1
 
-        if method == "simple_recovery":
-            st.info(
-                f"ℹ️ Species recovery estimated using UK ecological recovery rates "
-                f"({RECOVERY_RATE_PER_YEAR*100:.1f}%/yr). "
-                f"ML model requires 15+ years post-closure. "
-                f"Source: Natural England habitat restoration guidance."
-            )
-        elif method == "mixed":
-            st.info("ℹ️ Short-term uses ecological recovery rates; longer-term uses ML model.")
+        st.info(
+            f"ℹ️ Years 1–10 use UK ecological recovery rates (2.5%/yr). "
+            f"Years 15–20 use the ML model trained on 89 historical UK power station sites. "
+            f"Source: Natural England habitat restoration guidance."
+        )
 
         uplift_5yr  = max(0, (sp_5yr  - sp_before) / sp_before)
         uplift_10yr = max(0, (sp_10yr - sp_before) / sp_before)
@@ -508,8 +511,7 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         fig_eco, (ax_sp, ax_val) = plt.subplots(1, 2, figsize=(14, 6))
         fig_eco.suptitle(f"Ecological Recovery — {selected_plant}", fontsize=14, fontweight="bold")
 
-        # ── build trajectory using calendar years relative to closure ──
-        # show 20 years starting from max(current year, closure year)
+        # ── trajectory built relative to closure year ─────────
         start_year     = max(CURRENT_YEAR, closure_year)
         calendar_years = [start_year + y for y in years]
 
@@ -523,20 +525,34 @@ if st.sidebar.button("Calculate ROI", type="primary"):
             elif cal_year <= yr10_label:
                 progress = (cal_year - yr5_label) / (yr10_label - yr5_label)
                 trajectory.append(sp_5yr + (sp_10yr - sp_5yr) * progress)
+            elif cal_year <= yr15_label:
+                progress = (cal_year - yr10_label) / (yr15_label - yr10_label)
+                trajectory.append(sp_10yr + (sp_15yr - sp_10yr) * progress)
+            elif cal_year <= yr20_label:
+                progress = (cal_year - yr15_label) / (yr20_label - yr15_label)
+                trajectory.append(sp_15yr + (sp_20yr - sp_15yr) * progress)
             else:
-                trajectory.append(sp_10yr)
+                trajectory.append(sp_20yr)
 
         ax_sp.plot(calendar_years, trajectory, color="#2ecc71", linewidth=2.5)
         ax_sp.axhline(sp_before, color="#e74c3c", linewidth=1.5, linestyle="--",
                       label=f"Baseline ({sp_before:.0f} species)")
-        ax_sp.scatter([yr5_label, yr10_label], [sp_5yr, sp_10yr], color="#2ecc71", s=80, zorder=5)
-        ax_sp.annotate(f"{sp_5yr:.0f} species ({yr5_label})",
-                       xy=(yr5_label, sp_5yr), xytext=(yr5_label + 0.5, sp_5yr),
-                       fontsize=9, fontweight="bold", color="#2ecc71")
-        ax_sp.annotate(f"{sp_10yr:.0f} species ({yr10_label})",
-                       xy=(yr10_label, sp_10yr), xytext=(yr10_label + 0.5, sp_10yr),
-                       fontsize=9, fontweight="bold", color="#2ecc71")
-        ax_sp.fill_between(calendar_years, sp_before, trajectory, alpha=0.15, color="#2ecc71", label="Species gained")
+
+        # scatter only the points that fall within calendar_years
+        plot_years  = [yr5_label, yr10_label, yr15_label, yr20_label]
+        plot_counts = [sp_5yr, sp_10yr, sp_15yr, sp_20yr]
+        plot_labels = ["5yr", "10yr", "15yr (ML)", "20yr (ML)"]
+        for py, pc, pl in zip(plot_years, plot_counts, plot_labels):
+            if calendar_years[0] <= py <= calendar_years[-1]:
+                ax_sp.scatter([py], [pc], color="#2ecc71", s=80, zorder=5)
+                ax_sp.annotate(f"{pc:.0f} ({py}) {pl}",
+                               xy=(py, pc), xytext=(py + 0.5, pc),
+                               fontsize=8, fontweight="bold", color="#2ecc71")
+
+        ax_sp.fill_between(calendar_years, sp_before, trajectory,
+                           alpha=0.15, color="#2ecc71", label="Species gained")
+        ax_sp.axvline(yr15_label, color="#f39c12", linewidth=1.5, linestyle=":",
+                      alpha=0.8, label=f"{yr15_label} — ML model takes over")
         ax_sp.set_xlabel("Year", fontsize=11)
         ax_sp.set_ylabel("Predicted species count", fontsize=11)
         ax_sp.set_title("Predicted Species Recovery Trajectory")
@@ -545,10 +561,11 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         r2_5  = model_metrics["species_5yr"]["r2"]
         r2_10 = model_metrics["species_10yr"]["r2"]
         ax_sp.text(0.02, 0.02,
-                   f"Method: {method}\nML R²: yr5={r2_5:.2f}, yr10={r2_10:.2f}\nBased on 89 historical sites",
+                   f"Yrs 1-10: 2.5%/yr linear | Yrs 15-20: ML model\n"
+                   f"ML R²: yr5={r2_5:.2f}, yr10={r2_10:.2f} | 89 historical sites",
                    transform=ax_sp.transAxes, fontsize=8, color="grey", va="bottom")
 
-        # cumulative value follows actual trajectory
+        # cumulative value follows trajectory
         sp_cumulative = []
         running = 0
         for i, cal_year in enumerate(calendar_years):
@@ -559,15 +576,9 @@ if st.sidebar.button("Calculate ROI", type="primary"):
             sp_cumulative.append(running / 1e3)
 
         ax_val.plot(calendar_years, sp_cumulative, color="#f1c40f", linewidth=2.5)
-        ax_val.axvline(yr5_label, color="#2ecc71", linewidth=1.5, linestyle="--",
-                       alpha=0.7, label=f"{yr5_label} — 5yr prediction point")
+        ax_val.axvline(yr15_label, color="#f39c12", linewidth=1.5, linestyle=":",
+                       alpha=0.8, label=f"{yr15_label} — ML model takes over")
         ax_val.fill_between(calendar_years, 0, sp_cumulative, alpha=0.15, color="#f1c40f")
-        # find index closest to yr5_label for annotation
-        yr5_idx = min(range(len(calendar_years)), key=lambda i: abs(calendar_years[i] - yr5_label))
-        ax_val.annotate(f"£{sp_cumulative[yr5_idx]:,.0f}k",
-                        xy=(yr5_label, sp_cumulative[yr5_idx]),
-                        xytext=(yr5_label + 0.5, sp_cumulative[yr5_idx]),
-                        fontsize=9, fontweight="bold", color="#f1c40f")
         ax_val.annotate(f"£{sp_cumulative[-1]:,.0f}k",
                         xy=(calendar_years[-1], sp_cumulative[-1]),
                         xytext=(calendar_years[-3], sp_cumulative[-1] * 0.95),
@@ -581,13 +592,15 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         plt.tight_layout()
         st.pyplot(fig_eco)
 
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Baseline Species",        f"{sp_before:.0f}")
-        col2.metric(f"Predicted {yr5_label}",  f"{sp_5yr:.0f}")
-        col3.metric(f"Predicted {yr10_label}", f"{sp_10yr:.0f}")
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Baseline",                    f"{sp_before:.0f}")
+        col2.metric(f"Yr 5 ({yr5_label})",         f"{sp_5yr:.0f}")
+        col3.metric(f"Yr 15 ({yr15_label}) ML",    f"{sp_15yr:.0f}")
+        col4.metric(f"Yr 20 ({yr20_label}) ML",    f"{sp_20yr:.0f}")
+
         st.caption(
-            f"⚠️ Species predictions based on 89 historical UK power station sites. "
-            f"ML model R²={r2_10:.2f}. Use as directional indicator only."
+            f"⚠️ ML predictions based on 89 historical UK power station sites. "
+            f"R²={r2_10:.2f}. Use as directional indicator only."
         )
     else:
         st.info("No species prediction available for this plant.")
