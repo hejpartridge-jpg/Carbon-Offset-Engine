@@ -638,16 +638,26 @@ if st.sidebar.button("Calculate ROI", type="primary"):
         fig_eco.suptitle(f"Ecological Recovery — {selected_plant}",
                          fontsize=14, fontweight="bold")
 
-        trajectory = []
-        for year in years:
-            if year <= 5:
-                trajectory.append(sp_before + (sp_5yr - sp_before) * year / 5)
-            elif year <= 10:
-                trajectory.append(sp_5yr + (sp_10yr - sp_5yr) * (year - 5) / 5)
-            else:
-                trajectory.append(sp_10yr)
-
+        # build trajectory relative to closure year not current year
         calendar_years = [CURRENT_YEAR + y for y in years]
+
+        trajectory = []
+        for cal_year in calendar_years:
+            years_since = max(0, cal_year - closure_year)
+            if years_since <= 0:
+                # plant not yet closed
+                trajectory.append(sp_before)
+            elif cal_year <= yr5_label:
+                # interpolate from baseline to 5yr prediction
+                progress = (cal_year - closure_year) / (yr5_label - closure_year)
+                trajectory.append(sp_before + (sp_5yr - sp_before) * progress)
+            elif cal_year <= yr10_label:
+                # interpolate from 5yr to 10yr prediction
+                progress = (cal_year - yr5_label) / (yr10_label - yr5_label)
+                trajectory.append(sp_5yr + (sp_10yr - sp_5yr) * progress)
+            else:
+                # plateau after 10yr prediction
+                trajectory.append(sp_10yr)
 
         ax_sp.plot(calendar_years, trajectory, color="#2ecc71", linewidth=2.5)
         ax_sp.axhline(sp_before, color="#e74c3c", linewidth=1.5, linestyle="--",
